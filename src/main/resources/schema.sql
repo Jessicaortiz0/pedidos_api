@@ -1,0 +1,17 @@
+CREATE TABLE IF NOT EXISTS productos (
+ id BIGINT PRIMARY KEY AUTO_INCREMENT,
+ nombre VARCHAR(120) NOT NULL,
+ descripcion VARCHAR(500) NOT NULL,
+ stock INT NOT NULL CHECK(stock >= 0)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS pedidos (
+ id BIGINT PRIMARY KEY AUTO_INCREMENT,
+ nombre_cliente VARCHAR(120) NOT NULL,
+ cliente_clave VARCHAR(120) NOT NULL,
+ estado VARCHAR(10) NOT NULL CHECK(estado IN ('PENDIENTE','ENVIADO','RECIBIDO')),
+ productos JSON NOT NULL,
+ codigo_verificacion VARCHAR(6) NOT NULL,
+ cliente_pendiente VARCHAR(120) GENERATED ALWAYS AS
+ (CASE WHEN estado = 'PENDIENTE' THEN cliente_clave ELSE NULL END) PERSISTENT,
+ UNIQUE KEY un_pendiente_por_cliente(cliente_pendiente)
+) ENGINE=InnoDB;

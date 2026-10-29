@@ -1,0 +1,183 @@
+{
+  "info": {
+    "name": "Pedidos Kotlin MariaDB",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "producto1",
+      "value": "1"
+    },
+    {
+      "key": "producto2",
+      "value": "2"
+    },
+    {
+      "key": "pedidoId",
+      "value": "1"
+    },
+    {
+      "key": "codigo",
+      "value": "123456"
+    }
+  ],
+  "item": [
+    {
+      "name": "1 - Crear teclado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/productos",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"nombre\": \"Teclado\", \"descripcion\": \"Teclado USB\", \"stock\": 10}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code === 201) pm.collectionVariables.set(\"producto1\", pm.response.json().id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 - Crear ratón",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/productos",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"nombre\": \"Ratón\", \"descripcion\": \"Ratón USB\", \"stock\": 8}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code === 201) pm.collectionVariables.set(\"producto2\", pm.response.json().id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 - Consultar productos",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/productos"
+      }
+    },
+    {
+      "name": "4 - Crear pedido",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/pedidos",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"nombreCliente\": \"Jessica Ortiz\", \"productos\": [{\"productoId\": {{producto1}}, \"cantidad\": 2}, {\"productoId\": {{producto2}}, \"cantidad\": 1}]}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code === 201) { const r=pm.response.json(); pm.collectionVariables.set(\"pedidoId\",r.pedido.id); pm.collectionVariables.set(\"codigo\",r.codigoVerificacion); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5 - Ver stock descontado",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/productos"
+      }
+    },
+    {
+      "name": "6 - Marcar enviado",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "url": "{{baseUrl}}/pedidos/{{pedidoId}}/enviar"
+      }
+    },
+    {
+      "name": "7 - Confirmar recibido",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/pedidos/{{pedidoId}}/recibir",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"codigo\": \"{{codigo}}\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "8 - Consultar pedido",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/pedidos/{{pedidoId}}"
+      }
+    }
+  ]
+}
